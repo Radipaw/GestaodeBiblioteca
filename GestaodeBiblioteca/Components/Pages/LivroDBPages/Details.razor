@@ -1,0 +1,54 @@
+﻿@page "/livro/details"
+@using Microsoft.EntityFrameworkCore
+@using GestaodeBiblioteca.Models.Entities
+@inject IDbContextFactory<GestaodeBiblioteca.Data.AppDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>LivroDB</h2>
+    <hr />
+    @if (livrodb is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Titulo</dt>
+            <dd class="col-sm-10">@livrodb.Titulo</dd>
+            <dt class="col-sm-2">Autor</dt>
+            <dd class="col-sm-10">@livrodb.Autor</dd>
+            <dt class="col-sm-2">ISBN</dt>
+            <dd class="col-sm-10">@livrodb.ISBN</dd>
+            <dt class="col-sm-2">Disponivel</dt>
+            <dd class="col-sm-10">@livrodb.Disponivel</dd>
+            <dt class="col-sm-2">DataCadastro</dt>
+            <dd class="col-sm-10">@livrodb.DataCadastro</dd>
+        </dl>
+        <div>
+            <a href="@($"/livro/edit?id={livrodb.Id}")">Edit</a> |
+            <a href="@($"/livro")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private LivroDB? livrodb;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        livrodb = await context.Livro.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (livrodb is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

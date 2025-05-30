@@ -1,0 +1,145 @@
+﻿@page "/usuario/editar"
+@using GestaodeBiblioteca.Services
+@using Microsoft.EntityFrameworkCore
+@using GestaodeBiblioteca.Models.Entities
+@inject IDbContextFactory<GestaodeBiblioteca.Data.AppDbContext> DbFactory
+@inject NavigationManager NavigationManager
+@inject ToastService ToastService
+@inject UsuarioService UsuarioService
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>UsuarioDB</h2>
+<hr />
+@if (UsuarioDB is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="UsuarioDB" OnValidSubmit="UpdateUsuarioDB" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="UsuarioDB.Id" value="@UsuarioDB.Id" />
+                <div class="mb-3">
+                    <label for="nomecompleto" class="form-label">NomeCompleto:</label>
+                    <InputText id="nomecompleto" @bind-Value="UsuarioDB.NomeCompleto" class="form-control" aria-required="true"/>
+                    <ValidationMessage For="() => UsuarioDB.NomeCompleto" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="datanascimento" class="form-label">DataNascimento:</label>
+                    <InputDate id="datanascimento" @bind-Value="UsuarioDB.DataNascimento" class="form-control" aria-required="true"/>
+                    <ValidationMessage For="() => UsuarioDB.DataNascimento" class="text-danger" />
+                </div>
+                    <div class="mb-3">
+                        <label for="cpf" class="form-label">CPF:</label>
+                        <InputText id="cpf" @bind-Value="UsuarioDB.CPF" class="form-control" disabled />
+                        <ValidationMessage For="() => UsuarioDB.CPF" class="text-danger" />
+                    </div>
+                <div class="mb-3">
+                    <label for="telefone" class="form-label">Telefone:</label>
+                    <InputText id="telefone" @bind-Value="UsuarioDB.Telefone" class="form-control" aria-required="true"/>
+                    <ValidationMessage For="() => UsuarioDB.Telefone" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="endereco" class="form-label">Endereco:</label>
+                    <InputText id="endereco" @bind-Value="UsuarioDB.Endereco" class="form-control" aria-required="true"/>
+                    <ValidationMessage For="() => UsuarioDB.Endereco" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="categoria" class="form-label">Categoria:</label>
+                    <InputText id="categoria" @bind-Value="UsuarioDB.Categoria" class="form-control" aria-required="true"/>
+                    <ValidationMessage For="() => UsuarioDB.Categoria" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email:</label>
+                    <InputText id="email" @bind-Value="UsuarioDB.Email" class="form-control" />
+                    <ValidationMessage For="() => UsuarioDB.Email" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="matricula" class="form-label">Matricula:</label>
+                    <InputText id="matricula" @bind-Value="UsuarioDB.Matricula" class="form-control" />
+                    <ValidationMessage For="() => UsuarioDB.Matricula" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="departamentocurso" class="form-label">DepartamentoCurso:</label>
+                    <InputText id="departamentocurso" @bind-Value="UsuarioDB.DepartamentoCurso" class="form-control" />
+                    <ValidationMessage For="() => UsuarioDB.DepartamentoCurso" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="ativo" class="form-label">Ativo:</label>
+                    <InputCheckbox id="ativo" @bind-Value="UsuarioDB.Ativo" class="form-check-input" aria-required="true"/>
+                    <ValidationMessage For="() => UsuarioDB.Ativo" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/usuarios">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private UsuarioDB? UsuarioDB { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        UsuarioDB ??= await context.Usuario.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (UsuarioDB is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateUsuarioDB()
+    {
+        using var context = DbFactory.CreateDbContext();
+
+        var resultado = await UsuarioService.ValidarUsuario(UsuarioDB);
+
+        if (!resultado.IsValid)
+        {
+            ToastService.ShowError(resultado.ErrorMessage, 10);
+            return;
+        }
+        context.Attach(UsuarioDB!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!UsuarioDBExists(UsuarioDB!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+        ToastService.ShowSuccess("Usuário atualizado com sucesso!", 10);
+        NavigationManager.NavigateTo("/usuarios");
+    }
+
+    private bool UsuarioDBExists(int id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Usuario.Any(e => e.Id == id);
+    }
+}

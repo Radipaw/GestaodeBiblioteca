@@ -1,0 +1,40 @@
+﻿@page "/historicostatususuariodbs"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using GestaodeBiblioteca.Models.Entities
+@using GestaodeBiblioteca.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<GestaodeBiblioteca.Data.AppDbContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="historicostatususuariodbs/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.HistoricoStatusUsuarioDB">
+    <PropertyColumn Property="historicostatususuariodb => historicostatususuariodb.UsuarioId" />
+    <PropertyColumn Property="historicostatususuariodb => historicostatususuariodb.Status" />
+    <PropertyColumn Property="historicostatususuariodb => historicostatususuariodb.DataAlteracao" />
+    <PropertyColumn Property="historicostatususuariodb => historicostatususuariodb.Motivo" />
+    <PropertyColumn Property="historicostatususuariodb => historicostatususuariodb.Observacoes" />
+
+    <TemplateColumn Context="historicostatususuariodb">
+        <a href="@($"historicostatususuariodbs/edit?id={historicostatususuariodb.Id}")">Edit</a> |
+        <a href="@($"historicostatususuariodbs/details?id={historicostatususuariodb.Id}")">Details</a> |
+        <a href="@($"historicostatususuariodbs/delete?id={historicostatususuariodb.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private AppDbContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

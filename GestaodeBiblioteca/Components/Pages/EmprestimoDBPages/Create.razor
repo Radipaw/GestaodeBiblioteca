@@ -1,0 +1,65 @@
+﻿@page "/emprestimo/create"
+@using Microsoft.EntityFrameworkCore
+@using GestaodeBiblioteca.Models.Entities
+@inject IDbContextFactory<GestaodeBiblioteca.Data.AppDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>EmprestimoDB</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="EmprestimoDB" OnValidSubmit="AddEmprestimoDB" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="idusuario" class="form-label">Id do usuário:</label> 
+                <InputNumber id="idusuario" @bind-Value="EmprestimoDB.IdUsuario" class="form-control" /> 
+                <ValidationMessage For="() => EmprestimoDB.IdUsuario" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="idlivro" class="form-label">Id do Livro:</label> 
+                <InputNumber id="idlivro" @bind-Value="EmprestimoDB.IdLivro" class="form-control" /> 
+                <ValidationMessage For="() => EmprestimoDB.IdLivro" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="dataemprestimo" class="form-label">Data Emprestimo:</label> 
+                <InputDate id="dataemprestimo" @bind-Value="EmprestimoDB.DataEmprestimo" class="form-control" /> 
+                <ValidationMessage For="() => EmprestimoDB.DataEmprestimo" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/emprestimo">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private EmprestimoDB EmprestimoDB { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddEmprestimoDB()
+    {
+        using var context = DbFactory.CreateDbContext();
+        EmprestimoDB.DataDevolucaoPrevista = EmprestimoDB.DataEmprestimo.AddDays(7);
+        context.Emprestimo.Add(EmprestimoDB);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/emprestimo");
+    }
+
+    private void OnDataEmprestimoChanged(ChangeEventArgs e)
+    {
+        if (DateTime.TryParse(e.Value?.ToString(), out var dataEmprestimo))
+        {
+            EmprestimoDB.DataEmprestimo = dataEmprestimo;
+            EmprestimoDB.DataDevolucaoPrevista = dataEmprestimo.AddDays(7);
+        }
+    }
+
+}

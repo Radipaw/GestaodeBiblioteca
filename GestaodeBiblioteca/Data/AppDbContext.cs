@@ -14,6 +14,7 @@ namespace GestaodeBiblioteca.Data
         public DbSet<LivroDB> Livro { get; set; }
 
         public DbSet<EmprestimoDB> Emprestimo { get; set; }
+        public DbSet<GestaodeBiblioteca.Models.Entities.HistoricoStatusUsuarioDB> HistoricoStatusUsuarioDB { get; set; } = default!;
 
     }
 }

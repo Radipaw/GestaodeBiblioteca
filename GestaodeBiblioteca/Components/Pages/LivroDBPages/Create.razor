@@ -1,0 +1,59 @@
+﻿@page "/livro/create"
+@using Microsoft.EntityFrameworkCore
+@using GestaodeBiblioteca.Models.Entities
+@inject IDbContextFactory<GestaodeBiblioteca.Data.AppDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>LivroDB</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="LivroDB" OnValidSubmit="AddLivroDB" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="titulo" class="form-label">Titulo:</label> 
+                <InputText id="titulo" @bind-Value="LivroDB.Titulo" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => LivroDB.Titulo" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="autor" class="form-label">Autor:</label> 
+                <InputText id="autor" @bind-Value="LivroDB.Autor" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => LivroDB.Autor" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="isbn" class="form-label">ISBN:</label> 
+                <InputText id="isbn" @bind-Value="LivroDB.ISBN" class="form-control" /> 
+                <ValidationMessage For="() => LivroDB.ISBN" class="text-danger" /> 
+            </div>           
+            <div class="mb-3">
+                <label for="datacadastro" class="form-label">DataCadastro:</label> 
+                <InputDate id="datacadastro" @bind-Value="LivroDB.DataCadastro" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => LivroDB.DataCadastro" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/livro">Voltar à lista</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private LivroDB LivroDB { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddLivroDB()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Livro.Add(LivroDB);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/livro");
+    }
+}

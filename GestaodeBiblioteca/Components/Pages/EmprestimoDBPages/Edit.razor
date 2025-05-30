@@ -1,0 +1,110 @@
+﻿@page "/emprestimo/edit"
+@using Microsoft.EntityFrameworkCore
+@using GestaodeBiblioteca.Models.Entities
+@inject IDbContextFactory<GestaodeBiblioteca.Data.AppDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>EmprestimoDB</h2>
+<hr />
+@if (EmprestimoDB is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="EmprestimoDB" OnValidSubmit="UpdateEmprestimoDB" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="EmprestimoDB.Id" value="@EmprestimoDB.Id" />
+                <div class="mb-3">
+                    <label for="idusuario" class="form-label">IdUsuario:</label>
+                    <InputNumber id="idusuario" @bind-Value="EmprestimoDB.IdUsuario" class="form-control" />
+                    <ValidationMessage For="() => EmprestimoDB.IdUsuario" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="idlivro" class="form-label">IdLivro:</label>
+                    <InputNumber id="idlivro" @bind-Value="EmprestimoDB.IdLivro" class="form-control" />
+                    <ValidationMessage For="() => EmprestimoDB.IdLivro" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="dataemprestimo" class="form-label">DataEmprestimo:</label>
+                    <InputDate id="dataemprestimo" @bind-Value="EmprestimoDB.DataEmprestimo" class="form-control" disabled />
+                    <ValidationMessage For="() => EmprestimoDB.DataEmprestimo" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="status" class="form-label">Status:</label>
+                    <InputSelect id="status" @bind-Value="EmprestimoDB.Status" class="form-control">
+                        <option value="">Selecione um status</option>
+                        <option value="Ativo">Ativo</option>
+                        <option value="Finalizado">Finalizado</option>
+                        <option value="Atrasado">Atrasado</option>
+                    </InputSelect>
+                    <ValidationMessage For="() => EmprestimoDB.Status" class="text-danger" />
+                </div>
+
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/emprestimo">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private EmprestimoDB? EmprestimoDB { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        EmprestimoDB ??= await context.Emprestimo.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (EmprestimoDB is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateEmprestimoDB()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(EmprestimoDB!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!EmprestimoDBExists(EmprestimoDB!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/emprestimo");
+    }
+
+    private bool EmprestimoDBExists(int id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Emprestimo.Any(e => e.Id == id);
+    }
+}
