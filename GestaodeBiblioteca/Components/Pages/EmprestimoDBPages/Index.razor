@@ -1,0 +1,40 @@
+﻿@page "/emprestimo"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using GestaodeBiblioteca.Models.Entities
+@using GestaodeBiblioteca.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<GestaodeBiblioteca.Data.AppDbContext> DbFactory
+
+<PageTitle>Emprestimos</PageTitle>
+
+<h1>Emprestimos</h1>
+
+<p>
+    <a class="btn btn-primary" href="emprestimo/create">Criar Novo</a>
+</p>
+
+<QuickGrid Class="table" Items="context.Emprestimo">
+    <PropertyColumn Property="emprestimodb => emprestimodb.IdUsuario" />
+    <PropertyColumn Property="emprestimodb => emprestimodb.IdLivro" />
+    <PropertyColumn Property="emprestimodb => emprestimodb.DataEmprestimo" />
+    <PropertyColumn Property="emprestimodb => emprestimodb.DataDevolucaoPrevista" />
+    <PropertyColumn Property="emprestimodb => emprestimodb.DataDevolucaoEfetiva" />
+    <PropertyColumn Property="emprestimodb => emprestimodb.Status" />
+
+    <TemplateColumn Context="emprestimodb">
+        <a href="@($"emprestimo/edit?id={emprestimodb.Id}")">Editar</a> |
+        <a href="@($"emprestimo/details?id={emprestimodb.Id}")">Detalhes</a> |
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private AppDbContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

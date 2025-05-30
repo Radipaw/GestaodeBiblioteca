@@ -1,0 +1,115 @@
+﻿@page "/emprestimo/create"
+@using Microsoft.EntityFrameworkCore
+@using GestaodeBiblioteca.Models.Entities
+@inject IDbContextFactory<GestaodeBiblioteca.Data.AppDbContext> DbFactory
+@inject NavigationManager NavigationManager
+@using GestaodeBiblioteca.Services
+@inject ToastService ToastService
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>EmprestimoDB</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="EmprestimoDB" OnValidSubmit="AddEmprestimoDB" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="idusuario" class="form-label">Id do usuário:</label> 
+                <InputNumber id="idusuario" @bind-Value="EmprestimoDB.IdUsuario" class="form-control" /> 
+                <ValidationMessage For="() => EmprestimoDB.IdUsuario" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="idlivro" class="form-label">Id do Livro:</label> 
+                <InputNumber id="idlivro" @bind-Value="EmprestimoDB.IdLivro" class="form-control" /> 
+                <ValidationMessage For="() => EmprestimoDB.IdLivro" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="dataemprestimo" class="form-label">Data Emprestimo:</label> 
+                <InputDate id="dataemprestimo" @bind-Value="EmprestimoDB.DataEmprestimo" class="form-control" /> 
+                <ValidationMessage For="() => EmprestimoDB.DataEmprestimo" class="text-danger" /> 
+            </div>
+            <div class="mb-3">
+                <label for="status" class="form-label">Status:</label>
+                <InputSelect id="status" class="form-select" @bind-Value="EmprestimoDB.Status">
+                    <option value="">Selecione um status</option>
+                    <option value="Ativo">Ativo</option>
+                    <option value="Finalizado">Finalizado</option>
+                    <option value="Atrasado">Atrasado</option>
+                </InputSelect>
+                <ValidationMessage For="() => EmprestimoDB.Status" class="text-danger" />
+            </div>
+
+
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/emprestimo">Back to List</a>
+</div>
+
+@code {
+
+    [SupplyParameterFromForm]
+    private LivroDB? LivroDB { get; set; }
+
+    [SupplyParameterFromForm]
+    private EmprestimoDB EmprestimoDB { get; set; } = new()
+        {
+            Status = "Ativo" 
+        };
+
+    private async Task AddEmprestimoDB()
+    {
+        using var context = DbFactory.CreateDbContext();
+        var usuario = await context.Usuario.FirstOrDefaultAsync(u => u.Id == EmprestimoDB.IdUsuario);
+        LivroDB ??= await context.Livro.FirstOrDefaultAsync(m => m.Id == EmprestimoDB.IdLivro);
+
+        if (usuario is null)
+        {
+            ToastService.ShowError("Usuário não encontrado", 5);
+            return;
+        }
+
+        if (!usuario.Ativo)
+        {
+            ToastService.ShowError("Usuário inativo", 5);
+            return;
+        }
+        if(LivroDB.Disponivel == false)
+        {
+            ToastService.ShowError("Livro não disponivel", 5);
+            return;
+        }
+        if (LivroDB is null)
+        {
+            ToastService.ShowError("Livro não encontrado", 5);
+            return;
+        }
+
+        LivroDB.Disponivel = false;
+        EmprestimoDB.DataDevolucaoPrevista = EmprestimoDB.DataEmprestimo.AddDays(7);
+
+        context.Emprestimo.Add(EmprestimoDB);
+        context.Attach(LivroDB).State = EntityState.Modified;
+        await context.SaveChangesAsync();
+
+        ToastService.ShowSuccess("Empréstimo criado com sucesso", 5);
+        NavigationManager.NavigateTo("/emprestimo");
+    }
+
+    private void OnDataEmprestimoChanged(ChangeEventArgs e)
+    {
+        if (DateTime.TryParse(e.Value?.ToString(), out var dataEmprestimo))
+        {
+            EmprestimoDB.DataEmprestimo = dataEmprestimo;
+            EmprestimoDB.DataDevolucaoPrevista = dataEmprestimo.AddDays(7);
+        }
+    }
+
+}

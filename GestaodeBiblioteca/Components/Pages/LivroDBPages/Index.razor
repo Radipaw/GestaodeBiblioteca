@@ -1,0 +1,40 @@
+﻿@page "/livro"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using GestaodeBiblioteca.Models.Entities
+@using GestaodeBiblioteca.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<GestaodeBiblioteca.Data.AppDbContext> DbFactory
+
+<PageTitle>Livros</PageTitle>
+
+<h1>Livros</h1>
+
+<p>
+    <a class="btn btn-primary" href="livro/create">Criar Novo</a>
+</p>
+
+<QuickGrid Class="table" Items="context.Livro">
+    <PropertyColumn Property="livrodb => livrodb.Titulo" />
+    <PropertyColumn Property="livrodb => livrodb.Autor" />
+    <PropertyColumn Property="livrodb => livrodb.ISBN" />
+    <PropertyColumn Property="livrodb => livrodb.Disponivel" />
+    <PropertyColumn Property="livrodb => livrodb.DataCadastro" />
+
+    <TemplateColumn Context="livrodb">
+        <a href="@($"livro/edit?id={livrodb.Id}")">Editar</a> |
+        <a href="@($"livro/details?id={livrodb.Id}")">Detalhes</a> |
+        <a href="@($"livro/delete?id={livrodb.Id}")">Deletar</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private AppDbContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

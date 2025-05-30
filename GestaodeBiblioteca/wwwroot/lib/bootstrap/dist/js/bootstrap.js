@@ -184,17 +184,17 @@
     }
     return elementIsVisible;
   };
-  const isDisabled = element => {
+  const isreadonly = element => {
     if (!element || element.nodeType !== Node.ELEMENT_NODE) {
       return true;
     }
-    if (element.classList.contains('disabled')) {
+    if (element.classList.contains('readonly')) {
       return true;
     }
-    if (typeof element.disabled !== 'undefined') {
-      return element.disabled;
+    if (typeof element.readonly !== 'undefined') {
+      return element.readonly;
     }
-    return element.hasAttribute('disabled') && element.getAttribute('disabled') !== 'false';
+    return element.hasAttribute('readonly') && element.getAttribute('readonly') !== 'false';
   };
   const findShadowRoot = element => {
     if (!document.documentElement.attachShadow) {
@@ -793,7 +793,7 @@
     },
     focusableChildren(element) {
       const focusables = ['a', 'button', 'input', 'textarea', 'select', 'details', '[tabindex]', '[contenteditable="true"]'].map(selector => `${selector}:not([tabindex^="-"])`).join(',');
-      return this.find(focusables, element).filter(el => !isDisabled(el) && isVisible(el));
+      return this.find(focusables, element).filter(el => !isreadonly(el) && isVisible(el));
     },
     getSelectorFromElement(element) {
       const selector = getSelector(element);
@@ -826,7 +826,7 @@
       if (['A', 'AREA'].includes(this.tagName)) {
         event.preventDefault();
       }
-      if (isDisabled(this)) {
+      if (isreadonly(this)) {
         return;
       }
       const target = SelectorEngine.getElementFromSelector(this) || this.closest(`.${name}`);
@@ -1738,12 +1738,12 @@
   const CLASS_NAME_DROPSTART = 'dropstart';
   const CLASS_NAME_DROPUP_CENTER = 'dropup-center';
   const CLASS_NAME_DROPDOWN_CENTER = 'dropdown-center';
-  const SELECTOR_DATA_TOGGLE$3 = '[data-bs-toggle="dropdown"]:not(.disabled):not(:disabled)';
+  const SELECTOR_DATA_TOGGLE$3 = '[data-bs-toggle="dropdown"]:not(.readonly):not(:readonly)';
   const SELECTOR_DATA_TOGGLE_SHOWN = `${SELECTOR_DATA_TOGGLE$3}.${CLASS_NAME_SHOW$6}`;
   const SELECTOR_MENU = '.dropdown-menu';
   const SELECTOR_NAVBAR = '.navbar';
   const SELECTOR_NAVBAR_NAV = '.navbar-nav';
-  const SELECTOR_VISIBLE_ITEMS = '.dropdown-menu .dropdown-item:not(.disabled):not(:disabled)';
+  const SELECTOR_VISIBLE_ITEMS = '.dropdown-menu .dropdown-item:not(.readonly):not(:readonly)';
   const PLACEMENT_TOP = isRTL() ? 'top-end' : 'top-start';
   const PLACEMENT_TOPEND = isRTL() ? 'top-start' : 'top-end';
   const PLACEMENT_BOTTOM = isRTL() ? 'bottom-end' : 'bottom-start';
@@ -1799,7 +1799,7 @@
       return this._isShown() ? this.hide() : this.show();
     }
     show() {
-      if (isDisabled(this._element) || this._isShown()) {
+      if (isreadonly(this._element) || this._isShown()) {
         return;
       }
       const relatedTarget = {
@@ -1827,7 +1827,7 @@
       EventHandler.trigger(this._element, EVENT_SHOWN$5, relatedTarget);
     }
     hide() {
-      if (isDisabled(this._element) || !this._isShown()) {
+      if (isreadonly(this._element) || !this._isShown()) {
         return;
       }
       const relatedTarget = {
@@ -2889,7 +2889,7 @@
     if (['A', 'AREA'].includes(this.tagName)) {
       event.preventDefault();
     }
-    if (isDisabled(this)) {
+    if (isreadonly(this)) {
       return;
     }
     EventHandler.one(target, EVENT_HIDDEN$3, () => {
@@ -3934,8 +3934,8 @@
       this._observableSections = new Map();
       const targetLinks = SelectorEngine.find(SELECTOR_TARGET_LINKS, this._config.target);
       for (const anchor of targetLinks) {
-        // ensure that the anchor has an id and is not disabled
-        if (!anchor.hash || isDisabled(anchor)) {
+        // ensure that the anchor has an id and is not readonly
+        if (!anchor.hash || isreadonly(anchor)) {
           continue;
         }
         const observableSection = SelectorEngine.findOne(decodeURI(anchor.hash), this._element);
@@ -4151,7 +4151,7 @@
       }
       event.stopPropagation(); // stopPropagation/preventDefault both added to support up/down keys without scrolling the page
       event.preventDefault();
-      const children = this._getChildren().filter(element => !isDisabled(element));
+      const children = this._getChildren().filter(element => !isreadonly(element));
       let nextActiveElement;
       if ([HOME_KEY, END_KEY].includes(event.key)) {
         nextActiveElement = children[event.key === HOME_KEY ? 0 : children.length - 1];
@@ -4262,7 +4262,7 @@
     if (['A', 'AREA'].includes(this.tagName)) {
       event.preventDefault();
     }
-    if (isDisabled(this)) {
+    if (isreadonly(this)) {
       return;
     }
     Tab.getOrCreateInstance(this).show();

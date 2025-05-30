@@ -1,0 +1,81 @@
+﻿@page "/historico/create"
+@using Microsoft.EntityFrameworkCore
+@using GestaodeBiblioteca.Models.Entities
+@inject IDbContextFactory<GestaodeBiblioteca.Data.AppDbContext> DbFactory
+@inject NavigationManager NavigationManager
+@using GestaodeBiblioteca.Services
+@inject ToastService ToastService
+
+<PageTitle>Criar Ação</PageTitle>
+
+<h1>Criar Ação</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="HistoricoStatusUsuarioDB" OnValidSubmit="AddHistoricoStatusUsuarioDB" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="usuarioid" class="form-label">UsuarioId:</label> 
+                <InputNumber id="usuarioid" @bind-Value="HistoricoStatusUsuarioDB.UsuarioId" class="form-control" aria-required="true" readonly/> 
+                <ValidationMessage For="() => HistoricoStatusUsuarioDB.UsuarioId" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="status" class="form-label">Status:</label> 
+                <InputCheckbox id="status" @bind-Value="HistoricoStatusUsuarioDB.Status" class="form-check-input" aria-required="true"/> 
+                <ValidationMessage For="() => HistoricoStatusUsuarioDB.Status" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="dataalteracao" class="form-label">DataAlteracao:</label> 
+                <InputDate id="dataalteracao" @bind-Value="HistoricoStatusUsuarioDB.DataAlteracao" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => HistoricoStatusUsuarioDB.DataAlteracao" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="motivo" class="form-label">Motivo:</label> 
+                <InputText id="motivo" @bind-Value="HistoricoStatusUsuarioDB.Motivo" class="form-control" /> 
+                <ValidationMessage For="() => HistoricoStatusUsuarioDB.Motivo" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="observacoes" class="form-label">Observacoes:</label> 
+                <InputText id="observacoes" @bind-Value="HistoricoStatusUsuarioDB.Observacoes" class="form-control" /> 
+                <ValidationMessage For="() => HistoricoStatusUsuarioDB.Observacoes" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/historico">Histórico de ações</a>
+</div>
+
+@code {
+
+    protected override void OnInitialized()
+    {
+        HistoricoStatusUsuarioDB.UsuarioId = Id;
+    }
+
+    [SupplyParameterFromForm]
+    private HistoricoStatusUsuarioDB HistoricoStatusUsuarioDB { get; set; } = new();
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private UsuarioDB? UsuarioDB { get; set; }
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddHistoricoStatusUsuarioDB()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.HistoricoStatusUsuarioDB.Add(HistoricoStatusUsuarioDB);
+        UsuarioDB ??= await context.Usuario.FirstOrDefaultAsync(m => m.Id == Id);
+        UsuarioDB.Ativo = HistoricoStatusUsuarioDB.Status;
+        context.Attach(UsuarioDB!).State = EntityState.Modified;
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/historico");
+        ToastService.ShowSuccess("Usuário cadastrado com sucesso!", 10);
+    }
+}

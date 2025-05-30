@@ -1,0 +1,59 @@
+﻿@page "/emprestimo/details"
+@using Microsoft.EntityFrameworkCore
+@using GestaodeBiblioteca.Models.Entities
+@inject IDbContextFactory<GestaodeBiblioteca.Data.AppDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>EmprestimoDB</h2>
+    <hr />
+    @if (emprestimodb is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Usuario</dt>
+            <dd class="col-sm-10">@emprestimodb.Usuario.NomeCompleto</dd>
+            <dt class="col-sm-2">Titulo</dt>
+            <dd class="col-sm-10">@emprestimodb.Livro.Titulo</dd>
+            <dt class="col-sm-2">Data do Emprestimo</dt>
+            <dd class="col-sm-10">@emprestimodb.DataEmprestimo</dd>
+            <dt class="col-sm-2">Data da Devolucao Prevista</dt>
+            <dd class="col-sm-10">@emprestimodb.DataDevolucaoPrevista</dd>
+            <dt class="col-sm-2">Data da Devolucao Efetiva</dt>
+            <dd class="col-sm-10">@emprestimodb.DataDevolucaoEfetiva</dd>
+            <dt class="col-sm-2">Status</dt>
+            <dd class="col-sm-10">@emprestimodb.Status</dd>
+        </dl>
+        <div>
+            <a href="@($"/emprestimo/edit?id={emprestimodb.Id}")">Edit</a> |
+            <a href="@($"/emprestimo")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private EmprestimoDB? emprestimodb;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        emprestimodb = await context.Emprestimo
+            .Include(e => e.Usuario)
+            .Include(e => e.Livro)
+            .FirstOrDefaultAsync(e => e.Id == Id);
+
+        if (emprestimodb is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

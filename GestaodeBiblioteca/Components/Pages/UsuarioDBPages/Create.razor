@@ -1,0 +1,106 @@
+﻿@page "/usuario/criar"
+@using GestaodeBiblioteca.Services
+@using Microsoft.EntityFrameworkCore
+@using GestaodeBiblioteca.Models.Entities
+@inject IDbContextFactory<GestaodeBiblioteca.Data.AppDbContext> DbFactory
+@inject NavigationManager NavigationManager
+@inject ToastService ToastService
+@inject UsuarioService UsuarioService
+
+<PageTitle>Criar Usuário</PageTitle>
+
+<h1>Criar Usuário</h1>
+
+<hr />
+
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="UsuarioDB" OnValidSubmit="AddUsuarioDB" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="nomecompleto" class="form-label">Nome Completo:</label> 
+                <InputText id="nomecompleto" @bind-Value="UsuarioDB.NomeCompleto" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => UsuarioDB.NomeCompleto" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="datanascimento" class="form-label">Data de nascimento:</label> 
+                <InputDate id="datanascimento" @bind-Value="UsuarioDB.DataNascimento" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => UsuarioDB.DataNascimento" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="cpf" class="form-label">CPF:</label> 
+                <InputText id="cpf" @bind-Value="UsuarioDB.CPF" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => UsuarioDB.CPF" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="telefone" class="form-label">Telefone:</label> 
+                <InputText id="telefone" @bind-Value="UsuarioDB.Telefone" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => UsuarioDB.Telefone" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="endereco" class="form-label">Endereco:</label> 
+                <InputText id="endereco" @bind-Value="UsuarioDB.Endereco" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => UsuarioDB.Endereco" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <div class="mb-3">
+                    <label for="categoria" class="form-label">Categoria:</label>
+                    <InputSelect id="categoria" @bind-Value="UsuarioDB.Categoria" class="form-select" aria-required="true">
+                        <option value="">Selecione uma categoria...</option>
+                        <option value="estudante">Estudante</option>
+                        <option value="professor">Professor</option>
+                        <option value="visitante">Visitante</option>
+                    </InputSelect>
+                    <ValidationMessage For="() => UsuarioDB.Categoria" class="text-danger" />
+                </div>
+            </div>        
+            <div class="mb-3">
+                <label for="email" class="form-label">Email:</label> 
+                <InputText id="email" @bind-Value="UsuarioDB.Email" class="form-control" /> 
+                <ValidationMessage For="() => UsuarioDB.Email" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="matricula" class="form-label">Matricula:</label> 
+                <InputText id="matricula" @bind-Value="UsuarioDB.Matricula" class="form-control" /> 
+                <ValidationMessage For="() => UsuarioDB.Matricula" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="departamentocurso" class="form-label">Departamento/Curso:</label> 
+                <InputText id="departamentocurso" @bind-Value="UsuarioDB.DepartamentoCurso" class="form-control" /> 
+                <ValidationMessage For="() => UsuarioDB.DepartamentoCurso" class="text-danger" /> 
+            </div>
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/usuarios">Voltar à lista</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private UsuarioDB UsuarioDB { get; set; } = new();
+    private string errorMessage = string.Empty;
+    private async Task AddUsuarioDB()
+    {
+
+        var resultado = await UsuarioService.ValidarUsuario(UsuarioDB);
+
+        if (!resultado.IsValid)
+        {
+            ToastService.ShowError(resultado.ErrorMessage, 10);
+            return;
+        }
+		UsuarioDB.Ativo = true;
+        errorMessage = string.Empty;
+        using var context = DbFactory.CreateDbContext();
+        context.Usuario.Add(UsuarioDB);
+        await context.SaveChangesAsync(); 
+        ToastService.ShowSuccess("Usuário cadastrado com sucesso!",10);
+        NavigationManager.NavigateTo("/usuarios");
+
+
+    }
+}

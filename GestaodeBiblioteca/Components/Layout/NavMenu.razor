@@ -1,9 +1,13 @@
 ﻿<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">GestaodeBiblioteca</a>
+        <a class="navbar-brand" href="">Biblioteca Cesupa</a>
     </div>
 </div>
-
+<style>
+    .nav-scrollable {
+        background-color: #2c3e50; 
+    }
+</style>
 <input type="checkbox" title="Navigation menu" class="navbar-toggler" />
 
 <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
@@ -15,14 +19,24 @@
         </div>
 
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
+            <NavLink class="nav-link" href="usuarios">
+                <span class="bi bi-person-fill" aria-hidden="true"></span> Usuarios
             </NavLink>
         </div>
 
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
+            <NavLink class="nav-link" href="livro">
+                <span class="bi bi-book-fill" aria-hidden="true"></span> Livros
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="emprestimo">
+                <span class="bi bi-bag-dash-fill" aria-hidden="true"></span> Empréstimo
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="historico">
+                <span class="bi bi-bag-dash-fill" aria-hidden="true"></span> Histórico de Ações
             </NavLink>
         </div>
     </nav>

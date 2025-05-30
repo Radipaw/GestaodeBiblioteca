@@ -1,0 +1,94 @@
+﻿@page "/usuario/deletar"
+@using Microsoft.EntityFrameworkCore
+@using GestaodeBiblioteca.Models.Entities
+@inject IDbContextFactory<GestaodeBiblioteca.Data.AppDbContext> DbFactory
+@inject NavigationManager NavigationManager
+@using GestaodeBiblioteca.Services
+@inject ToastService ToastService
+
+<PageTitle>Delete</PageTitle>
+
+<h1>Delete</h1>
+
+<p>Are you sure you want to delete this?</p>
+<div>
+    <h2>UsuarioDB</h2>
+    <hr />
+    @if (usuariodb is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">NomeCompleto</dt>
+            <dd class="col-sm-10">@usuariodb.NomeCompleto</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">DataNascimento</dt>
+            <dd class="col-sm-10">@DateOnly.FromDateTime(usuariodb.DataNascimento)</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">CPF</dt>
+            <dd class="col-sm-10">@usuariodb.CPF</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Telefone</dt>
+            <dd class="col-sm-10">@usuariodb.Telefone</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Endereco</dt>
+            <dd class="col-sm-10">@usuariodb.Endereco</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Categoria</dt>
+            <dd class="col-sm-10">@usuariodb.Categoria</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Email</dt>
+            <dd class="col-sm-10">@usuariodb.Email</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Matricula</dt>
+            <dd class="col-sm-10">@usuariodb.Matricula</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">DepartamentoCurso</dt>
+            <dd class="col-sm-10">@usuariodb.DepartamentoCurso</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Ativo</dt>
+            <dd class="col-sm-10">@usuariodb.Ativo</dd>
+        </dl>
+        <EditForm method="post" Model="usuariodb" OnValidSubmit="DeleteUsuarioDB" FormName="delete" Enhance>
+            <button type="submit" class="btn btn-danger" readonly="@(usuariodb is null)">Delete</button> |
+            <a href="/usuarios">Back to List</a>
+        </EditForm>
+    }
+</div>
+
+@code {
+    private UsuarioDB? usuariodb;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        usuariodb = await context.Usuario.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (usuariodb is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    private async Task DeleteUsuarioDB()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Usuario.Remove(usuariodb!);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/usuarios");
+        ToastService.ShowSuccess("Usuário deletado com sucesso!", 10);
+    }
+}

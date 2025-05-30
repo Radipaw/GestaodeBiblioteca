@@ -1,0 +1,105 @@
+﻿@page "/usuarios"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using GestaodeBiblioteca.Models.Entities
+@using GestaodeBiblioteca.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<AppDbContext> DbFactory
+
+<PageTitle>Usuários Cadastrados</PageTitle>
+
+<h1>Usuários</h1>
+
+<p>
+    <a href="usuario/criar" class="btn btn-primary">Criar Novo</a>
+</p>
+
+<div class="search-container mb-4">
+    <div class="input-group">
+        <select @bind="searchType" class="form-select">
+            <option value="nome">Nome</option>
+            <option value="cpf">CPF</option>
+            <option value="id">ID</option>
+            <option value="matricula">Matrícula</option>
+        </select>
+        <input @bind="searchTerm"
+               type="text"
+               class="form-control"
+               placeholder="Digite para buscar..." />
+        <a @onclick="Search" class="btn btn-primary" type="button">
+            <i class="bi bi-search"></i> Pesquisar
+        </a>
+        <a @onclick="ClearSearch" class="btn btn-outline-secondary" type="button">
+            <i class="bi bi-x-lg"></i> Limpar
+        </a>
+    </div>
+</div>
+
+<QuickGrid Class="table" Items="filteredUsers">
+    <PropertyColumn Property="u => u.NomeCompleto" Sortable="true" Title="Nome" />
+    <PropertyColumn Property="u => u.Categoria" Sortable="true" Title="Tipo" />
+    <PropertyColumn Property="u => u.DepartamentoCurso" Sortable="true" Title="Departamento/Curso" />
+    <PropertyColumn Property="u => u.Ativo" Title="Ativo" />
+
+    <TemplateColumn>
+        <a href="@($"usuario/editar?id={context.Id}")" class="btn btn-sm btn-outline-primary">Editar</a>
+        <a href="@($"usuario/detalhes?id={context.Id}")" class="btn btn-sm btn-outline-info ms-1">Detalhes</a>
+        <a href="@($"usuario/deletar?id={context.Id}")" class="btn btn-sm btn-outline-danger ms-1">Deletar</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private AppDbContext context = default!;
+    private IQueryable<UsuarioDB> allUsers = default!;
+    private IQueryable<UsuarioDB> filteredUsers = default!;
+    private string searchTerm = string.Empty;
+    private string searchType = "nome";
+
+    protected override async Task OnInitializedAsync()
+    {
+        Console.WriteLine("OnInitializedAsync executado!");
+        context = DbFactory.CreateDbContext();
+        allUsers = context.Usuario.AsQueryable();
+        filteredUsers = allUsers;
+    }
+
+    private async Task Search()
+    {
+        Console.WriteLine("Search");
+        if (string.IsNullOrWhiteSpace(searchTerm))
+        {
+            filteredUsers = allUsers;
+        }
+        else
+        {
+            var term = searchTerm.ToLower();
+            filteredUsers = searchType switch
+            {
+                "nome" => allUsers.Where(u => u.NomeCompleto.ToLower().Contains(term)),
+                "cpf" => allUsers.Where(u => u.CPF.ToLower().Contains(term)),
+                "id" => int.TryParse(term, out var id)
+                            ? allUsers.Where(u => u.Id == id)
+                            : Enumerable.Empty<UsuarioDB>().AsQueryable(),
+                "matricula" => allUsers.Where(u => u.Matricula != null && u.Matricula.ToLower().Contains(term)),
+                _ => allUsers
+            };
+        }
+
+
+        filteredUsers = (await filteredUsers.ToListAsync()).AsQueryable();
+        StateHasChanged();
+    }
+
+
+    private Task ClearSearch()
+    {
+        Console.WriteLine("Search");
+        searchTerm = string.Empty;
+        filteredUsers = allUsers;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}
