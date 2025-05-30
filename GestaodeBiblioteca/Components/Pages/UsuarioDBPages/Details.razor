@@ -17,7 +17,9 @@
     }
     else {
         <dl class="row">
-            <dt class="col-sm-2">NomeCompleto</dt>
+            <dt class="col-sm-2">id</dt>
+            <dd class="col-sm-10">@usuariodb.Id</dd>
+            <dt class="col-sm-2">Nome</dt>
             <dd class="col-sm-10">@usuariodb.NomeCompleto</dd>
             <dt class="col-sm-2">DataNascimento</dt>
             <dd class="col-sm-10">@DateOnly.FromDateTime(usuariodb.DataNascimento)</dd>

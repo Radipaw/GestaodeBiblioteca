@@ -29,7 +29,19 @@
                 <label for="dataemprestimo" class="form-label">Data Emprestimo:</label> 
                 <InputDate id="dataemprestimo" @bind-Value="EmprestimoDB.DataEmprestimo" class="form-control" /> 
                 <ValidationMessage For="() => EmprestimoDB.DataEmprestimo" class="text-danger" /> 
-            </div>        
+            </div>
+            <div class="mb-3">
+                <label for="status" class="form-label">Status:</label>
+                <InputSelect id="status" class="form-select" @bind-Value="EmprestimoDB.Status" disabled>
+                    <option value="">Selecione um status</option>
+                    <option value="Ativo">Ativo</option>
+                    <option value="Finalizado">Finalizado</option>
+                    <option value="Atrasado">Atrasado</option>
+                </InputSelect>
+                <ValidationMessage For="() => EmprestimoDB.Status" class="text-danger" />
+            </div>
+
+
             <button type="submit" class="btn btn-primary">Create</button>
         </EditForm>
     </div>
@@ -40,15 +52,22 @@
 </div>
 
 @code {
+
+    [SupplyParameterFromForm]
+    private LivroDB? LivroDB { get; set; }
+
     [SupplyParameterFromForm]
     private EmprestimoDB EmprestimoDB { get; set; } = new();
 
-    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task AddEmprestimoDB()
     {
         using var context = DbFactory.CreateDbContext();
+        LivroDB ??= await context.Livro.FirstOrDefaultAsync(m => m.Id == EmprestimoDB.IdLivro);
+        LivroDB.Disponivel = false;
         EmprestimoDB.DataDevolucaoPrevista = EmprestimoDB.DataEmprestimo.AddDays(7);
+        EmprestimoDB.Status = "Ativo";
         context.Emprestimo.Add(EmprestimoDB);
+        context.Attach(LivroDB!).State = EntityState.Modified;
         await context.SaveChangesAsync();
         NavigationManager.NavigateTo("/emprestimo");
     }

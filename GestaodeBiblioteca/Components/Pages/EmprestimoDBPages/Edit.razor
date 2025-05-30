@@ -24,12 +24,12 @@ else
                 <input type="hidden" name="EmprestimoDB.Id" value="@EmprestimoDB.Id" />
                 <div class="mb-3">
                     <label for="idusuario" class="form-label">IdUsuario:</label>
-                    <InputNumber id="idusuario" @bind-Value="EmprestimoDB.IdUsuario" class="form-control" />
+                    <InputNumber id="idusuario" @bind-Value="EmprestimoDB.IdUsuario" class="form-control" disabled/>
                     <ValidationMessage For="() => EmprestimoDB.IdUsuario" class="text-danger" />
                 </div>
                 <div class="mb-3">
                     <label for="idlivro" class="form-label">IdLivro:</label>
-                    <InputNumber id="idlivro" @bind-Value="EmprestimoDB.IdLivro" class="form-control" />
+                    <InputNumber id="idlivro" @bind-Value="EmprestimoDB.IdLivro" class="form-control" disabled />
                     <ValidationMessage For="() => EmprestimoDB.IdLivro" class="text-danger" />
                 </div>
                 <div class="mb-3">
@@ -64,16 +64,24 @@ else
 
     [SupplyParameterFromForm]
     private EmprestimoDB? EmprestimoDB { get; set; }
+    [SupplyParameterFromForm]
+    private LivroDB? LivroDB { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
+
         using var context = DbFactory.CreateDbContext();
+
         EmprestimoDB ??= await context.Emprestimo.FirstOrDefaultAsync(m => m.Id == Id);
+
 
         if (EmprestimoDB is null)
         {
             NavigationManager.NavigateTo("notfound");
+            return;
         }
+
+
     }
 
     // To protect from overposting attacks, enable the specific properties you want to bind to.
@@ -82,7 +90,13 @@ else
     {
         using var context = DbFactory.CreateDbContext();
         context.Attach(EmprestimoDB!).State = EntityState.Modified;
+        LivroDB ??= await context.Livro.FirstOrDefaultAsync(m => m.Id == EmprestimoDB.IdLivro);
 
+        if (EmprestimoDB.Status == "Finalizado")
+        {
+            LivroDB.Disponivel = true;
+            context.Attach(LivroDB!).State = EntityState.Modified;
+        }
         try
         {
             await context.SaveChangesAsync();

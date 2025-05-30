@@ -28,7 +28,12 @@
                 <label for="isbn" class="form-label">ISBN:</label> 
                 <InputText id="isbn" @bind-Value="LivroDB.ISBN" class="form-control" /> 
                 <ValidationMessage For="() => LivroDB.ISBN" class="text-danger" /> 
-            </div>           
+            </div>
+            <div class="mb-3">
+                <label for="disponivel" class="form-label">Disponivel:</label>
+                <InputCheckbox id="disponivel" @bind-Value="LivroDB.Disponivel" class="form-check-input" aria-required="true" disabled/>
+                <ValidationMessage For="() => LivroDB.Disponivel" class="text-danger" />
+            </div>
             <div class="mb-3">
                 <label for="datacadastro" class="form-label">DataCadastro:</label> 
                 <InputDate id="datacadastro" @bind-Value="LivroDB.DataCadastro" class="form-control" aria-required="true"/> 
@@ -47,7 +52,6 @@
     [SupplyParameterFromForm]
     private LivroDB LivroDB { get; set; } = new();
 
-    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task AddLivroDB()
     {
         using var context = DbFactory.CreateDbContext();
