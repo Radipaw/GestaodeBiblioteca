@@ -474,7 +474,7 @@ select {
 select {
   word-wrap: normal;
 }
-select:disabled {
+select:readonly {
   opacity: 1;
 }
 
@@ -488,10 +488,10 @@ button,
 [type=submit] {
   -webkit-appearance: button;
 }
-button:not(:disabled),
-[type=button]:not(:disabled),
-[type=reset]:not(:disabled),
-[type=submit]:not(:disabled) {
+button:not(:readonly),
+[type=button]:not(:readonly),
+[type=reset]:not(:readonly),
+[type=submit]:not(:readonly) {
   cursor: pointer;
 }
 

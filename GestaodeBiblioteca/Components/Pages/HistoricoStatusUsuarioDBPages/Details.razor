@@ -43,7 +43,8 @@
     protected override async Task OnInitializedAsync()
     {
         using var context = DbFactory.CreateDbContext();
-        historicostatususuariodb = await context.HistoricoStatusUsuarioDB.FirstOrDefaultAsync(m => m.Id == Id);
+        historicostatususuariodb = await context.HistoricoStatusUsuarioDB.Include(e => e.Usuario)
+        .FirstOrDefaultAsync(m => m.Id == Id);
 
         if (historicostatususuariodb is null)
         {

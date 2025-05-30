@@ -44,7 +44,7 @@ else
                 </div>
                 <div class="mb-3">
                     <label for="datacadastro" class="form-label">DataCadastro:</label>
-                    <InputDate id="datacadastro" @bind-Value="LivroDB.DataCadastro" class="form-control" aria-required="true" disabled/>
+                    <InputDate id="datacadastro" @bind-Value="LivroDB.DataCadastro" class="form-control" aria-required="true" readonly/>
                     <ValidationMessage For="() => LivroDB.DataCadastro" class="text-danger" />
                 </div>
                 <button type="submit" class="btn btn-primary">Save</button>

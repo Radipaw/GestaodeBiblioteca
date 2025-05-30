@@ -18,7 +18,7 @@
             <ValidationSummary class="text-danger" role="alert"/>
             <div class="mb-3">
                 <label for="usuarioid" class="form-label">UsuarioId:</label> 
-                <InputNumber id="usuarioid" @bind-Value="HistoricoStatusUsuarioDB.UsuarioId" class="form-control" aria-required="true" disabled/> 
+                <InputNumber id="usuarioid" @bind-Value="HistoricoStatusUsuarioDB.UsuarioId" class="form-control" aria-required="true" readonly/> 
                 <ValidationMessage For="() => HistoricoStatusUsuarioDB.UsuarioId" class="text-danger" /> 
             </div>        
             <div class="mb-3">

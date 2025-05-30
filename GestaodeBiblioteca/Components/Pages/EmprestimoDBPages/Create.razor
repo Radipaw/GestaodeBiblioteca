@@ -3,6 +3,8 @@
 @using GestaodeBiblioteca.Models.Entities
 @inject IDbContextFactory<GestaodeBiblioteca.Data.AppDbContext> DbFactory
 @inject NavigationManager NavigationManager
+@using GestaodeBiblioteca.Services
+@inject ToastService ToastService
 
 <PageTitle>Create</PageTitle>
 
@@ -32,7 +34,7 @@
             </div>
             <div class="mb-3">
                 <label for="status" class="form-label">Status:</label>
-                <InputSelect id="status" class="form-select" @bind-Value="EmprestimoDB.Status" disabled>
+                <InputSelect id="status" class="form-select" @bind-Value="EmprestimoDB.Status">
                     <option value="">Selecione um status</option>
                     <option value="Ativo">Ativo</option>
                     <option value="Finalizado">Finalizado</option>
@@ -57,18 +59,47 @@
     private LivroDB? LivroDB { get; set; }
 
     [SupplyParameterFromForm]
-    private EmprestimoDB EmprestimoDB { get; set; } = new();
+    private EmprestimoDB EmprestimoDB { get; set; } = new()
+        {
+            Status = "Ativo" 
+        };
 
     private async Task AddEmprestimoDB()
     {
         using var context = DbFactory.CreateDbContext();
+        var usuario = await context.Usuario.FirstOrDefaultAsync(u => u.Id == EmprestimoDB.IdUsuario);
         LivroDB ??= await context.Livro.FirstOrDefaultAsync(m => m.Id == EmprestimoDB.IdLivro);
+
+        if (usuario is null)
+        {
+            ToastService.ShowError("Usuário não encontrado", 5);
+            return;
+        }
+
+        if (!usuario.Ativo)
+        {
+            ToastService.ShowError("Usuário inativo", 5);
+            return;
+        }
+        if(LivroDB.Disponivel == false)
+        {
+            ToastService.ShowError("Livro não disponivel", 5);
+            return;
+        }
+        if (LivroDB is null)
+        {
+            ToastService.ShowError("Livro não encontrado", 5);
+            return;
+        }
+
         LivroDB.Disponivel = false;
         EmprestimoDB.DataDevolucaoPrevista = EmprestimoDB.DataEmprestimo.AddDays(7);
-        EmprestimoDB.Status = "Ativo";
+
         context.Emprestimo.Add(EmprestimoDB);
-        context.Attach(LivroDB!).State = EntityState.Modified;
+        context.Attach(LivroDB).State = EntityState.Modified;
         await context.SaveChangesAsync();
+
+        ToastService.ShowSuccess("Empréstimo criado com sucesso", 5);
         NavigationManager.NavigateTo("/emprestimo");
     }
 

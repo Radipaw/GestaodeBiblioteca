@@ -31,7 +31,7 @@
             </div>
             <div class="mb-3">
                 <label for="disponivel" class="form-label">Disponivel:</label>
-                <InputCheckbox id="disponivel" @bind-Value="LivroDB.Disponivel" class="form-check-input" aria-required="true" disabled/>
+                <InputCheckbox id="disponivel" @bind-Value="LivroDB.Disponivel" class="form-check-input" aria-required="true" readonly/>
                 <ValidationMessage For="() => LivroDB.Disponivel" class="text-danger" />
             </div>
             <div class="mb-3">

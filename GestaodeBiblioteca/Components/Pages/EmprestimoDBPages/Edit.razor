@@ -24,17 +24,17 @@ else
                 <input type="hidden" name="EmprestimoDB.Id" value="@EmprestimoDB.Id" />
                 <div class="mb-3">
                     <label for="idusuario" class="form-label">IdUsuario:</label>
-                    <InputNumber id="idusuario" @bind-Value="EmprestimoDB.IdUsuario" class="form-control" disabled/>
+                    <InputNumber id="idusuario" @bind-Value="EmprestimoDB.IdUsuario" class="form-control" readonly/>
                     <ValidationMessage For="() => EmprestimoDB.IdUsuario" class="text-danger" />
                 </div>
                 <div class="mb-3">
                     <label for="idlivro" class="form-label">IdLivro:</label>
-                    <InputNumber id="idlivro" @bind-Value="EmprestimoDB.IdLivro" class="form-control" disabled />
+                    <InputNumber id="idlivro" @bind-Value="EmprestimoDB.IdLivro" class="form-control" readonly />
                     <ValidationMessage For="() => EmprestimoDB.IdLivro" class="text-danger" />
                 </div>
                 <div class="mb-3">
                     <label for="dataemprestimo" class="form-label">DataEmprestimo:</label>
-                    <InputDate id="dataemprestimo" @bind-Value="EmprestimoDB.DataEmprestimo" class="form-control" disabled />
+                    <InputDate id="dataemprestimo" @bind-Value="EmprestimoDB.DataEmprestimo" class="form-control" readonly />
                     <ValidationMessage For="() => EmprestimoDB.DataEmprestimo" class="text-danger" />
                 </div>
                 <div class="mb-3">

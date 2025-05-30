@@ -37,7 +37,7 @@ else
                 </div>
                     <div class="mb-3">
                         <label for="cpf" class="form-label">CPF:</label>
-                        <InputText id="cpf" @bind-Value="UsuarioDB.CPF" class="form-control" disabled />
+                    <InputText id="cpf" @bind-Value="UsuarioDB.CPF" class="form-control" readonly />
                         <ValidationMessage For="() => UsuarioDB.CPF" class="text-danger" />
                     </div>
                 <div class="mb-3">
@@ -72,7 +72,7 @@ else
                 </div>
                 <div class="mb-3">
                     <label for="ativo" class="form-label">Ativo:</label>
-                    <InputCheckbox id="ativo" @bind-Value="UsuarioDB.Ativo" class="form-check-input" aria-required="true" disabled/>
+                    <InputCheckbox id="ativo" @bind-Value="UsuarioDB.Ativo" class="form-check-input" aria-required="true" readonly/>
                     <ValidationMessage For="() => UsuarioDB.Ativo" class="text-danger" />
                 </div>
                 <button type="submit" class="btn btn-primary">Save</button>
@@ -110,7 +110,7 @@ else
     {
         using var context = DbFactory.CreateDbContext();
 
-        var resultado = await UsuarioService.ValidarUsuario(UsuarioDB);
+        var resultado = await UsuarioService.ValidarUsuarioEdit(UsuarioDB);
 
         if (!resultado.IsValid)
         {

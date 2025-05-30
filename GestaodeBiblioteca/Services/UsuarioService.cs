@@ -116,5 +116,50 @@ namespace GestaodeBiblioteca.Services
         }
 
 
+    
+
+    public async Task<(bool IsValid, string ErrorMessage)> ValidarUsuarioEdit(UsuarioDB usuarioDB)
+        {
+
+            if (string.IsNullOrWhiteSpace(usuarioDB.NomeCompleto))
+            {
+                return (false, "Nome completo é obrigatório");
+            }
+
+            if (usuarioDB.DataNascimento == default)
+            {
+                return (false, "Data de nascimento é obrigatória");
+            }
+
+
+            if (usuarioDB.DataNascimento > DateTime.Now.AddYears(-5))
+            {
+                return (false, "Data de nascimento inválida (muito recente)");
+            }
+
+            if (usuarioDB.DataNascimento < DateTime.Now.AddYears(-120))
+            {
+                return (false, "Data de nascimento inválida (muito antiga)");
+            }
+
+
+            
+
+            var telefoneValidation = ValidarTelefone(usuarioDB.Telefone);
+            if (!telefoneValidation.IsValid)
+            {
+                return (false, telefoneValidation.ErrorMessage);
+            }
+
+
+            if (!string.IsNullOrWhiteSpace(usuarioDB.Email) && !IsValidEmail(usuarioDB.Email))
+            {
+                return (false, "E-mail inválido");
+            }
+
+            return (true, string.Empty);
+        }
+
+
     }
 }
