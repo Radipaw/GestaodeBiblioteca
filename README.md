@@ -1,11 +1,12 @@
 # Sistema de Gestão de Biblioteca
 
-##integrantes
+## integrantes
 Enzo Kikuchi, Igor Acatauassu, Leandro Sarkis, Mario Anijar, Pedro Monteiro
 
+## Projeto
 Este é um sistema para gerenciamento de usuários e empréstimos em uma biblioteca. Permite o cadastro, atualização, consulta e inativação de usuários, além do controle de empréstimos de itens do acervo.
 
-##Funcionalidades
+## Funcionalidades
 
 - Cadastro de novos usuários com validações de CPF e campos obrigatórios
 - Consulta de usuários por nome, CPF, ID ou matrícula
@@ -13,7 +14,7 @@ Este é um sistema para gerenciamento de usuários e empréstimos em uma bibliot
 - Inativação lógica de usuários (com histórico e motivo)
 -  Registro de empréstimos com validação de regras e prazos
 
-##Tecnologias Utilizadas
+## Tecnologias Utilizadas
 
 - **.NET 7 / 8**
 - **ASP.NET Core Blazor**
