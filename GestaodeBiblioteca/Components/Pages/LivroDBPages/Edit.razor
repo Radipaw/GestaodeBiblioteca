@@ -4,9 +4,9 @@
 @inject IDbContextFactory<GestaodeBiblioteca.Data.AppDbContext> DbFactory
 @inject NavigationManager NavigationManager
 
-<PageTitle>Edit</PageTitle>
+<PageTitle>Editar Livro</PageTitle>
 
-<h1>Edit</h1>
+<h1>Editar Livro</h1>
 
 <h2>LivroDB</h2>
 <hr />
@@ -44,7 +44,7 @@ else
                 </div>
                 <div class="mb-3">
                     <label for="datacadastro" class="form-label">DataCadastro:</label>
-                    <InputDate id="datacadastro" @bind-Value="LivroDB.DataCadastro" class="form-control" aria-required="true"/>
+                    <InputDate id="datacadastro" @bind-Value="LivroDB.DataCadastro" class="form-control" aria-required="true" disabled/>
                     <ValidationMessage For="() => LivroDB.DataCadastro" class="text-danger" />
                 </div>
                 <button type="submit" class="btn btn-primary">Save</button>

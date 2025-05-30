@@ -6,12 +6,12 @@
 @implements IAsyncDisposable
 @inject IDbContextFactory<GestaodeBiblioteca.Data.AppDbContext> DbFactory
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Emprestimos</PageTitle>
 
-<h1>Index</h1>
+<h1>Emprestimos</h1>
 
 <p>
-    <a class="btn btn-primary" href="emprestimo/create">Create New</a>
+    <a class="btn btn-primary" href="emprestimo/create">Criar Novo</a>
 </p>
 
 <QuickGrid Class="table" Items="context.Emprestimo">

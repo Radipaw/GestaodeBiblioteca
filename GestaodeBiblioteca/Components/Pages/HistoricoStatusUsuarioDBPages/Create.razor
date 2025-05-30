@@ -1,14 +1,15 @@
-﻿@page "/historicostatususuariodbs/create"
+﻿@page "/historico/create"
 @using Microsoft.EntityFrameworkCore
 @using GestaodeBiblioteca.Models.Entities
 @inject IDbContextFactory<GestaodeBiblioteca.Data.AppDbContext> DbFactory
 @inject NavigationManager NavigationManager
+@using GestaodeBiblioteca.Services
+@inject ToastService ToastService
 
-<PageTitle>Create</PageTitle>
+<PageTitle>Criar Ação</PageTitle>
 
-<h1>Create</h1>
+<h1>Criar Ação</h1>
 
-<h2>HistoricoStatusUsuarioDB</h2>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -17,7 +18,7 @@
             <ValidationSummary class="text-danger" role="alert"/>
             <div class="mb-3">
                 <label for="usuarioid" class="form-label">UsuarioId:</label> 
-                <InputNumber id="usuarioid" @bind-Value="HistoricoStatusUsuarioDB.UsuarioId" class="form-control" aria-required="true"/> 
+                <InputNumber id="usuarioid" @bind-Value="HistoricoStatusUsuarioDB.UsuarioId" class="form-control" aria-required="true" disabled/> 
                 <ValidationMessage For="() => HistoricoStatusUsuarioDB.UsuarioId" class="text-danger" /> 
             </div>        
             <div class="mb-3">
@@ -46,19 +47,35 @@
 </div>
 
 <div>
-    <a href="/historicostatususuariodbs">Back to List</a>
+    <a href="/historico">Histórico de ações</a>
 </div>
 
 @code {
+
+    protected override void OnInitialized()
+    {
+        HistoricoStatusUsuarioDB.UsuarioId = Id;
+    }
+
     [SupplyParameterFromForm]
     private HistoricoStatusUsuarioDB HistoricoStatusUsuarioDB { get; set; } = new();
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private UsuarioDB? UsuarioDB { get; set; }
 
     // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task AddHistoricoStatusUsuarioDB()
     {
         using var context = DbFactory.CreateDbContext();
         context.HistoricoStatusUsuarioDB.Add(HistoricoStatusUsuarioDB);
+        UsuarioDB ??= await context.Usuario.FirstOrDefaultAsync(m => m.Id == Id);
+        UsuarioDB.Ativo = HistoricoStatusUsuarioDB.Status;
+        context.Attach(UsuarioDB!).State = EntityState.Modified;
         await context.SaveChangesAsync();
-        NavigationManager.NavigateTo("/historicostatususuariodbs");
+        NavigationManager.NavigateTo("/historico");
+        ToastService.ShowSuccess("Usuário cadastrado com sucesso!", 10);
     }
 }
