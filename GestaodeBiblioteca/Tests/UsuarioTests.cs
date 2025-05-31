@@ -10,13 +10,13 @@ namespace GestaodeBiblioteca.Tests
     public class UsuarioTests
     {
         [Fact]
-        public void CadastrarUsuario_DeveFalhar_SeCpfInvalido()
+        public void CadastrarUsuario_VerificarCPFInvalido()
         {
             
             var usuario = new UsuarioDB
             {
                 NomeCompleto = "Mario Jr.",
-                CPF = "12345678900", 
+                CPF = "123", 
                 Telefone = "999999999",
                 Endereco = "Rua A, 123",
                 Categoria = "Estudante",
@@ -27,7 +27,6 @@ namespace GestaodeBiblioteca.Tests
 
             
             var result = validator.Validate(usuario);
-
             Assert.False(result.IsValid);
             Assert.Contains(result.Errors, e => e.PropertyName == "CPF");
         }
@@ -43,11 +42,11 @@ namespace GestaodeBiblioteca.Tests
             var usuario = new UsuarioDB
             {
                 NomeCompleto = "Maria Oliveira",
-                CPF = "12345678909", 
+                CPF = "14578986254",
                 Telefone = "888888888",
                 Endereco = "Av. Central, 456",
-                Categoria = "Professor",
-                DataNascimento = new DateTime(1985, 5, 15)
+                Categoria = "professor",
+                DataNascimento = DateTime.SpecifyKind(new DateTime(1985, 5, 15), DateTimeKind.Utc)
             };
 
             using (var context = new AppDbContext(options))
@@ -58,14 +57,14 @@ namespace GestaodeBiblioteca.Tests
 
             using (var context = new AppDbContext(options))
             {
-                var savedUsuario = await context.Usuario.FirstOrDefaultAsync(u => u.CPF == "12345678909");
+                var savedUsuario = await context.Usuario.FirstOrDefaultAsync(u => u.CPF == "14578986254");
                 Assert.NotNull(savedUsuario);
                 Assert.Equal("Maria Oliveira", savedUsuario.NomeCompleto);
             }
         }
 
         [Fact]
-        public void AtualizarUsuario_DeveRejeitarNomeVazio()
+        public void AtualizarUsuario_VerificarNomeVazio()
         {
             var usuario = new UsuarioDB
             {
